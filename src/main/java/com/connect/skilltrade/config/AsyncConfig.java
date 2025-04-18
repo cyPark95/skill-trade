@@ -1,7 +1,7 @@
 package com.connect.skilltrade.config;
 
 import com.connect.skilltrade.common.async.MdcTaskDecorator;
-import com.connect.skilltrade.common.response.AsyncExceptionHandler;
+import com.connect.skilltrade.common.exception.handler.AsyncExceptionHandler;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

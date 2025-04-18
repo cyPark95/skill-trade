@@ -1,6 +1,7 @@
-package com.connect.skilltrade.common.response;
+package com.connect.skilltrade.common.exception.handler;
 
 import com.connect.skilltrade.common.exception.BusinessException;
+import com.connect.skilltrade.common.response.ExceptionResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

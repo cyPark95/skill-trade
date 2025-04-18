@@ -1,4 +1,4 @@
-package com.connect.skilltrade.common.response;
+package com.connect.skilltrade.common.exception.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;

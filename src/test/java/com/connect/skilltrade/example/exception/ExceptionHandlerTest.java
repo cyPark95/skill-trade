@@ -1,6 +1,6 @@
 package com.connect.skilltrade.example.exception;
 
-import com.connect.skilltrade.common.response.BusinessExceptionHandler;
+import com.connect.skilltrade.common.exception.handler.BusinessExceptionHandler;
 import com.connect.skilltrade.common.response.ExceptionResponse;
 import com.connect.skilltrade.example.exception.controller.ExceptionController;
 import com.fasterxml.jackson.databind.ObjectMapper;
