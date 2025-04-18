@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: skill-trade
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/skill-trade
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        show-sql: true
+        format-sql: true
+    hibernate:
+      ddl-auto: create-drop
