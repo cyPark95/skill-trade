@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -61,12 +60,10 @@ public class JwtProvider implements TokenGenerator {
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + (this.accessTokenValidityTime * MILLISECONDS_TO_SECONDS));
 
-        Map<String, Long> claims = Map.of(TOKEN_CLAIM_KEY, id);
-
         return Jwts.builder()
                 .issuedAt(now)
                 .expiration(expiredDate)
-                .claims(claims)
+                .claim(TOKEN_CLAIM_KEY, id)
                 .signWith(this.secretKey)
                 .compact();
     }
@@ -78,7 +75,7 @@ public class JwtProvider implements TokenGenerator {
         return Jwts.builder()
                 .issuedAt(now)
                 .expiration(expiredDate)
-                .signWith(secretKey)
+                .signWith(this.secretKey)
                 .compact();
     }
 }
