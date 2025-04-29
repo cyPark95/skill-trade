@@ -4,7 +4,8 @@ import com.connect.skilltrade.common.exception.BusinessException;
 import com.connect.skilltrade.security.domain.SecurityExceptionStatus;
 import com.connect.skilltrade.security.domain.Token;
 import com.connect.skilltrade.security.domain.TokenGenerator;
-import io.jsonwebtoken.Jwts;
+import com.connect.skilltrade.security.domain.TokenExecutor;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import java.util.Date;
 
 @Slf4j
 @Component
-public class JwtProvider implements TokenGenerator {
+public class JwtProvider implements TokenGenerator, TokenExecutor {
 
     private static final int MILLISECONDS_TO_SECONDS = 1000;
     private static final String TOKEN_CLAIM_KEY = "USER_ID";
@@ -30,15 +31,15 @@ public class JwtProvider implements TokenGenerator {
             @Value("${jwt.access-token-validate-in-seconds}") Long accessTokenValidityTime,
             @Value("${jwt.refresh-token-validate-in-seconds}") Long refreshTokenValidityTime
     ) {
-        this.secretKey = getSecretKey(secret);
+        this.secretKey = createSecretKey(secret);
         this.accessTokenValidityTime = accessTokenValidityTime;
         this.refreshTokenValidityTime = refreshTokenValidityTime;
     }
 
     @Override
     public Token generateToken(Long userId) {
-        String accessToken = makeAccessJwt(userId);
-        String refreshToken = makeRefreshJwt();
+        String accessToken = createAccessJwt(userId);
+        String refreshToken = createRefreshJwt();
 
         return new Token(
                 accessToken,
@@ -47,16 +48,24 @@ public class JwtProvider implements TokenGenerator {
         );
     }
 
-    private SecretKey getSecretKey(String secret) {
+    @Override
+    public Long executeUserId(String accessToken) throws BusinessException {
+        Claims claims = getClaims(accessToken);
+        Long userId = claims.get(TOKEN_CLAIM_KEY, Long.class);
+
+        if(userId == null) {
+            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_CLAIMS_NULL);
+        }
+
+        return userId;
+    }
+
+    private SecretKey createSecretKey(String secret) {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private String makeAccessJwt(Long id) {
-        if(id == null) {
-            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_CLAIMS_NULL);
-        }
-
+    private String createAccessJwt(Long id) {
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + (this.accessTokenValidityTime * MILLISECONDS_TO_SECONDS));
 
@@ -68,7 +77,7 @@ public class JwtProvider implements TokenGenerator {
                 .compact();
     }
 
-    private String makeRefreshJwt() {
+    private String createRefreshJwt() {
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + (this.refreshTokenValidityTime * MILLISECONDS_TO_SECONDS));
 
@@ -77,5 +86,19 @@ public class JwtProvider implements TokenGenerator {
                 .expiration(expiredDate)
                 .signWith(this.secretKey)
                 .compact();
+    }
+
+    private Claims getClaims(String token) {
+        try {
+            return Jwts.parser()
+                    .verifyWith(this.secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            throw new BusinessException(e, SecurityExceptionStatus.EXPIRED_TOKEN, token);
+        } catch (UnsupportedJwtException | MalformedJwtException | IllegalArgumentException e) {
+            throw new BusinessException(e, SecurityExceptionStatus.INVALID_TOKEN, token);
+        }
     }
 }
