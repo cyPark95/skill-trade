@@ -14,6 +14,8 @@ public enum SecurityExceptionStatus implements ExceptionStatus {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 토큰[%s] 입니다.", 102),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰[%s] 입니다.", 103),
     INVALID_AUTHORIZATION(HttpStatus.UNAUTHORIZED, "유효하지 않은 인증 정보[%s] 입니다.", 104),
+    MISSING_REQUEST_CONTEXT(HttpStatus.INTERNAL_SERVER_ERROR, "Request Context가 존재하지 않습니다.", 105),
+    REQUIRED_AUTHENTICATION_USER_ID(HttpStatus.UNAUTHORIZED, "인증된 사용자 정보는 필수 값이지만 null 입니다.", 106),
     ;
 
     private final HttpStatus httpStatus;
