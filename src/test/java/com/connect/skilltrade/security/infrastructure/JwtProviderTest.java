@@ -68,12 +68,12 @@ class JwtProviderTest {
 
     @DisplayName("엑세스 토큰에서 사용자 ID 정보 조회 성공")
     @Test
-    void successExecuteUserId() {
+    void successExtractUserId() {
         // given
         Token token = jwtProvider.generateToken(USER_ID, ROLES);
 
         // when
-        Long result = jwtProvider.executeUserId(token.accessToken());
+        Long result = jwtProvider.extractUserId(token.accessToken());
 
         // then
         assertThat(result).isEqualTo(USER_ID);
@@ -81,52 +81,52 @@ class JwtProviderTest {
 
     @DisplayName("만료된 엑세스 토큰으로 사용자 ID 조회 시, 예외 발생")
     @Test
-    void failExecuteUserId_expiredToken() throws Exception {
+    void failExtractUserId_expiredToken() throws Exception {
         // given
         Token token = jwtProvider.generateToken(USER_ID, ROLES);
         Thread.sleep(1000L);
 
         // when
         // then
-        assertThatThrownBy(() -> jwtProvider.executeUserId(token.accessToken()))
+        assertThatThrownBy(() -> jwtProvider.extractUserId(token.accessToken()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(SecurityExceptionStatus.EXPIRED_TOKEN.getMessage().formatted(token.accessToken()));
     }
 
     @DisplayName("잘못된 형식의 엑세스 토근으로 사용자 ID 조회 시, 예외 발생")
     @Test
-    void failExecuteUserId_invalidToken() {
+    void failExtractUserId_invalidToken() {
         // given
         String invalidToken = "INVALID_ACCESS_TOKEN";
 
         // when
         // then
-        assertThatThrownBy(() -> jwtProvider.executeUserId(invalidToken))
+        assertThatThrownBy(() -> jwtProvider.extractUserId(invalidToken))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(SecurityExceptionStatus.INVALID_TOKEN.getMessage().formatted(invalidToken));
     }
 
     @DisplayName("엑세스 토큰에서 조회한 사용자 ID가 null인 경우, 예외 발생")
     @Test
-    void failExecuteUserId_subjectNotFound() {
+    void failExtractUserId_subjectNotFound() {
         // given
         Token token = jwtProvider.generateToken(USER_ID, ROLES);
 
         // when
         // then
-        assertThatThrownBy(() -> jwtProvider.executeUserId(token.refreshToken()))
+        assertThatThrownBy(() -> jwtProvider.extractUserId(token.refreshToken()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NOT_FOUND.getMessage());
     }
 
     @DisplayName("엑세스 토큰에서 사용자 역할 목록 조회 성공")
     @Test
-    void successExecuteRoles() {
+    void successExtractRoles() {
         // given
         Token token = jwtProvider.generateToken(USER_ID, ROLES);
 
         // when
-        List<Role> result = jwtProvider.executeRoles(token.accessToken());
+        List<Role> result = jwtProvider.extractRoles(token.accessToken());
 
         // then
         assertThat(result).isEqualTo(ROLES);
@@ -134,13 +134,13 @@ class JwtProviderTest {
 
     @DisplayName("엑세스 토큰에서 조회한 사용자 역할이 없는 경우, 예외 발생")
     @Test
-    void failExecuteRoles_roleNotFound() {
+    void failExtractRoles_roleNotFound() {
         // given
         Token token = jwtProvider.generateToken(USER_ID, ROLES);
 
         // when
         // then
-        assertThatThrownBy(() -> jwtProvider.executeRoles(token.refreshToken()))
+        assertThatThrownBy(() -> jwtProvider.extractRoles(token.refreshToken()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_ROLE_CLAIM_NOT_FOUND.getMessage());
     }

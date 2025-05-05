@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class JwtProvider implements TokenGenerator, TokenExecutor {
+public class JwtProvider implements TokenGenerator, TokenExtractor {
 
     private static final int SECONDS_TO_MILLISECONDS = 1000;
     private static final String ROLE_CLAIM_KEY = "roles";
@@ -49,7 +49,7 @@ public class JwtProvider implements TokenGenerator, TokenExecutor {
     }
 
     @Override
-    public Long executeUserId(String accessToken) throws BusinessException {
+    public Long extractUserId(String accessToken) throws BusinessException {
         Claims claims = getClaims(accessToken);
         String subject = claims.getSubject();
 
@@ -61,7 +61,7 @@ public class JwtProvider implements TokenGenerator, TokenExecutor {
     }
 
     @Override
-    public List<Role> executeRoles(String accessToken) {
+    public List<Role> extractRoles(String accessToken) {
         Claims claims = getClaims(accessToken);
         List<?> roles = claims.get(ROLE_CLAIM_KEY, List.class);
 

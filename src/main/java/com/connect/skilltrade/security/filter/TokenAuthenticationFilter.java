@@ -4,7 +4,7 @@ import com.connect.skilltrade.common.exception.BusinessException;
 import com.connect.skilltrade.common.exception.ExceptionStatus;
 import com.connect.skilltrade.common.response.ExceptionResponse;
 import com.connect.skilltrade.security.domain.SecurityExceptionStatus;
-import com.connect.skilltrade.security.domain.TokenExecutor;
+import com.connect.skilltrade.security.domain.TokenExtractor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +31,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final ObjectMapper objectMapper;
-    private final TokenExecutor tokenExecutor;
+    private final TokenExtractor tokenExtractor;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
@@ -50,7 +50,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            Long userId = tokenExecutor.executeUserId(accessToken);
+            Long userId = tokenExtractor.extractUserId(accessToken);
             log.info("Authorization user ID: {}", userId);
 
             RequestAttributes requestContext = Objects.requireNonNull(RequestContextHolder.getRequestAttributes());
