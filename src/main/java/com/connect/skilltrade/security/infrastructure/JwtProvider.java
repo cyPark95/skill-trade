@@ -57,7 +57,7 @@ public class JwtProvider implements TokenGenerator, TokenExecutor {
         String subject = claims.getSubject();
 
         if(!StringUtils.hasText(subject)) {
-            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL);
+            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NOT_FOUND);
         }
 
         return Long.valueOf(subject);
@@ -70,11 +70,11 @@ public class JwtProvider implements TokenGenerator, TokenExecutor {
 
     private String createAccessJwt(Long id, List<Role> roles) {
         if(id == null) {
-            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL);
+            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL_OR_EMPTY);
         }
 
         if(roles == null || roles.isEmpty()) {
-            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_ROLE_CLAIM_NULL);
+            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_ROLE_CLAIM_NULL_OR_EMPTY);
         }
 
         Date now = new Date();

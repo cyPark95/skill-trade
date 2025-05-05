@@ -52,7 +52,7 @@ class JwtProviderTest {
         // then
         assertThatThrownBy(() -> jwtProvider.generateToken(null, ROLES))
                 .isInstanceOf(BusinessException.class)
-                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL.getMessage());
+                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL_OR_EMPTY.getMessage());
     }
 
     @DisplayName("사용자 역할이 null 또는 빈 값인 경우, JWT 생성 시 예외 발생")
@@ -63,7 +63,7 @@ class JwtProviderTest {
         // then
         assertThatThrownBy(() -> jwtProvider.generateToken(USER_ID, roles))
                 .isInstanceOf(BusinessException.class)
-                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_ROLE_CLAIM_NULL.getMessage());
+                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_ROLE_CLAIM_NULL_OR_EMPTY.getMessage());
     }
 
     @DisplayName("엑세스 토큰에서 사용자 ID 정보 조회 성공")
@@ -116,6 +116,6 @@ class JwtProviderTest {
         // then
         assertThatThrownBy(() -> jwtProvider.executeUserId(token.accessToken()))
                 .isInstanceOf(BusinessException.class)
-                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL.getMessage());
+                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL_OR_EMPTY.getMessage());
     }
 }
