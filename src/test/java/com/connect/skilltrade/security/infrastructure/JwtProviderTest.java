@@ -70,7 +70,7 @@ class JwtProviderTest {
     @Test
     void successExecuteUserId() {
         // given
-        Token token = jwtProvider.generateToken(USER_ID);
+        Token token = jwtProvider.generateToken(USER_ID, ROLES);
 
         // when
         Long result = jwtProvider.executeUserId(token.accessToken());
@@ -83,7 +83,7 @@ class JwtProviderTest {
     @Test
     void failExecuteUserId_expiredToken() throws Exception {
         // given
-        Token token = jwtProvider.generateToken(USER_ID);
+        Token token = jwtProvider.generateToken(USER_ID, ROLES);
         Thread.sleep(1000L);
 
         // when
@@ -110,12 +110,12 @@ class JwtProviderTest {
     @Test
     void failExecuteUserId_invalidArgument() {
         // given
-        Token token = jwtProvider.generateToken(null);
+        Token token = jwtProvider.generateToken(null, ROLES);
 
         // when
         // then
         assertThatThrownBy(() -> jwtProvider.executeUserId(token.accessToken()))
                 .isInstanceOf(BusinessException.class)
-                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_CLAIMS_NULL.getMessage());
+                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL.getMessage());
     }
 }

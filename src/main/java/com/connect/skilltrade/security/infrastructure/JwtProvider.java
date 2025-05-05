@@ -12,6 +12,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -40,8 +41,8 @@ public class JwtProvider implements TokenGenerator, TokenExecutor {
 
     @Override
     public Token generateToken(Long userId, List<Role> roles) {
-        String accessToken = makeAccessJwt(userId, roles);
-        String refreshToken = makeRefreshJwt();
+        String accessToken = createAccessJwt(userId, roles);
+        String refreshToken = createRefreshJwt();
 
         return new Token(
                 accessToken,
@@ -53,13 +54,13 @@ public class JwtProvider implements TokenGenerator, TokenExecutor {
     @Override
     public Long executeUserId(String accessToken) throws BusinessException {
         Claims claims = getClaims(accessToken);
-        Long userId = claims.get(TOKEN_CLAIM_KEY, Long.class);
+        String subject = claims.getSubject();
 
-        if(userId == null) {
-            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_CLAIMS_NULL);
+        if(!StringUtils.hasText(subject)) {
+            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL);
         }
 
-        return userId;
+        return Long.valueOf(subject);
     }
 
     private SecretKey createSecretKey(String secret) {

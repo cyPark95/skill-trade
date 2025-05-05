@@ -1,5 +1,6 @@
 package com.connect.skilltrade.security.filter;
 
+import com.connect.skilltrade.security.domain.Role;
 import com.connect.skilltrade.security.domain.SecurityExceptionStatus;
 import com.connect.skilltrade.security.domain.Token;
 import com.connect.skilltrade.security.domain.TokenGenerator;
@@ -12,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class TokenAuthenticationFilterTest {
 
     private static final long USER_ID = -1L;
+    private static final List<Role> ROLES = List.of(Role.EXPERT, Role.USER);
 
     @Autowired
     private MockMvc mvc;
@@ -32,7 +36,7 @@ class TokenAuthenticationFilterTest {
     @Test
     void successesAuthentication() throws Exception {
         // given
-        Token token = tokenGenerator.generateToken(USER_ID);
+        Token token = tokenGenerator.generateToken(USER_ID, ROLES);
 
         // when
         // then
@@ -81,7 +85,7 @@ class TokenAuthenticationFilterTest {
     @Test
     void failAuthentication_expiredToken() throws Exception {
         // given
-        Token token = tokenGenerator.generateToken(USER_ID);
+        Token token = tokenGenerator.generateToken(USER_ID, ROLES);
         Thread.sleep(2000);
 
         // when
