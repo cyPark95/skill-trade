@@ -118,4 +118,30 @@ class JwtProviderTest {
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NOT_FOUND.getMessage());
     }
+
+    @DisplayName("엑세스 토큰에서 사용자 역할 목록 조회 성공")
+    @Test
+    void successExecuteRoles() {
+        // given
+        Token token = jwtProvider.generateToken(USER_ID, ROLES);
+
+        // when
+        List<Role> result = jwtProvider.executeRoles(token.accessToken());
+
+        // then
+        assertThat(result).isEqualTo(ROLES);
+    }
+
+    @DisplayName("엑세스 토큰에서 조회한 사용자 역할이 없는 경우, 예외 발생")
+    @Test
+    void failExecuteRoles_roleNotFound() {
+        // given
+        Token token = jwtProvider.generateToken(USER_ID, ROLES);
+
+        // when
+        // then
+        assertThatThrownBy(() -> jwtProvider.executeRoles(token.refreshToken()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_ROLE_CLAIM_NOT_FOUND.getMessage());
+    }
 }

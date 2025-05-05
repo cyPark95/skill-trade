@@ -1,11 +1,7 @@
 package com.connect.skilltrade.security.infrastructure;
 
 import com.connect.skilltrade.common.exception.BusinessException;
-import com.connect.skilltrade.security.domain.Role;
-import com.connect.skilltrade.security.domain.SecurityExceptionStatus;
-import com.connect.skilltrade.security.domain.Token;
-import com.connect.skilltrade.security.domain.TokenGenerator;
-import com.connect.skilltrade.security.domain.TokenExecutor;
+import com.connect.skilltrade.security.domain.*;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -17,6 +13,7 @@ import org.springframework.util.StringUtils;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -61,6 +58,20 @@ public class JwtProvider implements TokenGenerator, TokenExecutor {
         }
 
         return Long.valueOf(subject);
+    }
+
+    @Override
+    public List<Role> executeRoles(String accessToken) {
+        Claims claims = getClaims(accessToken);
+        List<?> roles = claims.get(ROLE_CLAIM_KEY, List.class);
+
+        if (roles == null || roles.isEmpty()) {
+            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_ROLE_CLAIM_NOT_FOUND);
+        }
+
+        return roles.stream()
+                .map(role -> Role.valueOf(role.toString().toUpperCase()))
+                .collect(Collectors.toList());
     }
 
     private SecretKey createSecretKey(String secret) {

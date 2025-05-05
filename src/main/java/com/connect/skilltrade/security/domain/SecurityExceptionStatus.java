@@ -16,6 +16,7 @@ public enum SecurityExceptionStatus implements ExceptionStatus {
     INVALID_AUTHORIZATION(HttpStatus.UNAUTHORIZED, "유효하지 않은 인증 정보[%s] 입니다.", 104),
     ACCESS_TOKEN_ROLE_CLAIM_NULL_OR_EMPTY(HttpStatus.BAD_REQUEST, "엑세스 토큰에 포함될 역할 정보가 null 또는 빈 값 입니다.", 107),
     ACCESS_TOKEN_SUBJECT_NOT_FOUND(HttpStatus.BAD_REQUEST, "엑세스 토큰에 포함된 Subject 정보를 찾을 수 없습니다.", 108),
+    ACCESS_TOKEN_ROLE_CLAIM_NOT_FOUND(HttpStatus.BAD_REQUEST, "엑세스 토큰에 포함된 역할 정보를 찾을 수 없습니다.", 109),
     ;
 
     private final HttpStatus httpStatus;
