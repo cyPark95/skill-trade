@@ -108,14 +108,14 @@ class JwtProviderTest {
 
     @DisplayName("엑세스 토큰에서 조회한 사용자 ID가 null인 경우, 예외 발생")
     @Test
-    void failExecuteUserId_invalidArgument() {
+    void failExecuteUserId_subjectNotFound() {
         // given
-        Token token = jwtProvider.generateToken(null, ROLES);
+        Token token = jwtProvider.generateToken(USER_ID, ROLES);
 
         // when
         // then
-        assertThatThrownBy(() -> jwtProvider.executeUserId(token.accessToken()))
+        assertThatThrownBy(() -> jwtProvider.executeUserId(token.refreshToken()))
                 .isInstanceOf(BusinessException.class)
-                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL_OR_EMPTY.getMessage());
+                .hasMessage(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NOT_FOUND.getMessage());
     }
 }
