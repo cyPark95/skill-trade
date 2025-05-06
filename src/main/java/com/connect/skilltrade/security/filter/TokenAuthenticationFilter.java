@@ -35,8 +35,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
-        log.info("requestURI: {}", request.getRequestURI());
-
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (!isValidAuthorizationHeader(authorization)) {
             sendExceptionResponse(response, SecurityExceptionStatus.INVALID_AUTHORIZATION);
