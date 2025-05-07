@@ -27,9 +27,9 @@ public class JwtProvider implements TokenGenerator, TokenExtractor {
     private final long refreshTokenValidityTime;
 
     public JwtProvider(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access-token-validate-in-seconds}") Long accessTokenValidityTime,
-            @Value("${jwt.refresh-token-validate-in-seconds}") Long refreshTokenValidityTime
+            @Value("${security.jwt.secret}") String secret,
+            @Value("${security.jwt.access-token-validate-in-seconds}") Long accessTokenValidityTime,
+            @Value("${security.jwt.refresh-token-validate-in-seconds}") Long refreshTokenValidityTime
     ) {
         this.secretKey = createSecretKey(secret);
         this.accessTokenValidityTime = accessTokenValidityTime;

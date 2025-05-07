@@ -9,6 +9,7 @@ import com.connect.skilltrade.security.infrastructure.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@DisplayName("Token 인증 필터 검증")
 @WebMvcTest({TokenAuthenticationFilter.class, JwtProvider.class, TokenAuthenticationFilterTestController.class})
 class TokenAuthenticationFilterTest {
 
@@ -31,6 +33,9 @@ class TokenAuthenticationFilterTest {
 
     @Autowired
     private TokenGenerator tokenGenerator;
+    
+    @Value("${security.grant-type}")
+    private String grantType;
 
     @DisplayName("Token 인증 성공")
     @Test
@@ -41,7 +46,7 @@ class TokenAuthenticationFilterTest {
         // when
         // then
         mvc.perform(post("/test/authentication")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken()))
+                        .header(HttpHeaders.AUTHORIZATION, grantType + " " + token.accessToken()))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -57,7 +62,7 @@ class TokenAuthenticationFilterTest {
                 .andExpect(jsonPath("$.code").value(SecurityExceptionStatus.INVALID_AUTHORIZATION.getCode()));
     }
 
-    @DisplayName("Bearer로 시작하지 않은 인증 정보로 요청한 경우 인증 실패")
+    @DisplayName("다른 Grant Type으로 시작하는 인증 정보로 요청한 경우 인증 실패")
     @Test
     void failAuthentication_emptyPrefix() throws Exception {
         // when
@@ -75,7 +80,7 @@ class TokenAuthenticationFilterTest {
         // when
         // then
         mvc.perform(post("/test/authentication")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer "))
+                        .header(HttpHeaders.AUTHORIZATION, grantType))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value(SecurityExceptionStatus.INVALID_AUTHORIZATION.getCode()));
@@ -91,7 +96,7 @@ class TokenAuthenticationFilterTest {
         // when
         // then
         mvc.perform(post("/test/authentication")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken()))
+                        .header(HttpHeaders.AUTHORIZATION, grantType + " " + token.accessToken()))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value(SecurityExceptionStatus.EXPIRED_TOKEN.getCode()));
@@ -103,7 +108,7 @@ class TokenAuthenticationFilterTest {
         // when
         // then
         mvc.perform(post("/test/authentication")
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + "accessToken"))
+                        .header(HttpHeaders.AUTHORIZATION, grantType + " " + "accessToken"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value(SecurityExceptionStatus.INVALID_TOKEN.getCode()));

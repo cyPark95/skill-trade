@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -25,13 +25,21 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-
-    private static final String BEARER_PREFIX = "Bearer ";
 
     private final ObjectMapper objectMapper;
     private final TokenExtractor tokenExtractor;
+    private final String grantType;
+
+    public TokenAuthenticationFilter(
+            ObjectMapper objectMapper,
+            TokenExtractor tokenExtractor,
+            @Value("${security.grant-type}") String grantType
+    ) {
+        this.objectMapper = objectMapper;
+        this.tokenExtractor = tokenExtractor;
+        this.grantType = grantType;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
@@ -41,7 +49,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String accessToken = authorization.substring(BEARER_PREFIX.length()).trim();
+        String accessToken = authorization.substring(grantType.length()).trim();
         if (!StringUtils.hasText(accessToken)) {
             sendExceptionResponse(response, SecurityExceptionStatus.INVALID_AUTHORIZATION);
             return;
@@ -65,7 +73,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isValidAuthorizationHeader(String value) {
-        return StringUtils.hasText(value) && value.startsWith(BEARER_PREFIX);
+        return StringUtils.hasText(value) && value.startsWith(grantType);
     }
 
     private void sendExceptionResponse(HttpServletResponse response, ExceptionStatus status) throws IOException {
