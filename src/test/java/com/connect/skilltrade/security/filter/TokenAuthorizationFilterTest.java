@@ -4,7 +4,7 @@ import com.connect.skilltrade.security.domain.Role;
 import com.connect.skilltrade.security.domain.SecurityExceptionStatus;
 import com.connect.skilltrade.security.domain.Token;
 import com.connect.skilltrade.security.domain.TokenGenerator;
-import com.connect.skilltrade.security.filter.controller.TokenAuthenticationFilterTestController;
+import com.connect.skilltrade.security.filter.controller.TokenAuthorizationFilterTestController;
 import com.connect.skilltrade.security.infrastructure.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,9 +21,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@DisplayName("Token 인증 필터 검증")
-@WebMvcTest({TokenAuthenticationFilter.class, JwtProvider.class, TokenAuthenticationFilterTestController.class})
-class TokenAuthenticationFilterTest {
+@DisplayName("Token 인가 필터 검증")
+@WebMvcTest({TokenAuthorizationFilter.class, JwtProvider.class, TokenAuthorizationFilterTestController.class})
+class TokenAuthorizationFilterTest {
 
     private static final long USER_ID = -1L;
     private static final List<Role> ROLES = List.of(Role.EXPERT, Role.USER);
@@ -37,7 +37,7 @@ class TokenAuthenticationFilterTest {
     @Value("${security.grant-type}")
     private String grantType;
 
-    @DisplayName("Token 인증 성공")
+    @DisplayName("Token 인가 성공")
     @Test
     void successesAuthentication() throws Exception {
         // given
@@ -45,48 +45,48 @@ class TokenAuthenticationFilterTest {
 
         // when
         // then
-        mvc.perform(post("/test/authentication")
+        mvc.perform(post("/test/authorization")
                         .header(HttpHeaders.AUTHORIZATION, grantType + " " + token.accessToken()))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
 
-    @DisplayName("HTTP 헤더에 인증 정보 없는 요청인 경우 인증 실패")
+    @DisplayName("HTTP 헤더에 인가 정보 없는 요청인 경우 인가 실패")
     @Test
     void failAuthentication_emptyAuthorization() throws Exception {
         // when
         // then
-        mvc.perform(post("/test/authentication"))
+        mvc.perform(post("/test/authorization"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value(SecurityExceptionStatus.INVALID_AUTHORIZATION.getCode()));
     }
 
-    @DisplayName("다른 Grant Type으로 시작하는 인증 정보로 요청한 경우 인증 실패")
+    @DisplayName("다른 Grant Type으로 시작하는 인가 정보로 요청한 경우 인가 실패")
     @Test
     void failAuthentication_emptyPrefix() throws Exception {
         // when
         // then
-        mvc.perform(post("/test/authentication")
+        mvc.perform(post("/test/authorization")
                         .header(HttpHeaders.AUTHORIZATION, "accessToken"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value(SecurityExceptionStatus.INVALID_AUTHORIZATION.getCode()));
     }
 
-    @DisplayName("인증 정보에 토큰 없이 요청한 경우 인증 실패")
+    @DisplayName("인가 정보에 토큰 없이 요청한 경우 인가 실패")
     @Test
     void failAuthentication_emptyToken() throws Exception {
         // when
         // then
-        mvc.perform(post("/test/authentication")
+        mvc.perform(post("/test/authorization")
                         .header(HttpHeaders.AUTHORIZATION, grantType))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value(SecurityExceptionStatus.INVALID_AUTHORIZATION.getCode()));
     }
 
-    @DisplayName("만료된 토큰 요청인 경우 인증 실패")
+    @DisplayName("만료된 토큰 요청인 경우 인가 실패")
     @Test
     void failAuthentication_expiredToken() throws Exception {
         // given
@@ -95,19 +95,19 @@ class TokenAuthenticationFilterTest {
 
         // when
         // then
-        mvc.perform(post("/test/authentication")
+        mvc.perform(post("/test/authorization")
                         .header(HttpHeaders.AUTHORIZATION, grantType + " " + token.accessToken()))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value(SecurityExceptionStatus.EXPIRED_TOKEN.getCode()));
     }
 
-    @DisplayName("유효하지 않은 토큰 요청인 경우 인증 실패")
+    @DisplayName("유효하지 않은 토큰 요청인 경우 인가 실패")
     @Test
     void failAuthentication_invalidToken() throws Exception {
         // when
         // then
-        mvc.perform(post("/test/authentication")
+        mvc.perform(post("/test/authorization")
                         .header(HttpHeaders.AUTHORIZATION, grantType + " " + "accessToken"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())

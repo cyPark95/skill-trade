@@ -4,9 +4,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class TokenAuthenticationFilterTestController {
+public class TokenAuthorizationFilterTestController {
 
-    @PostMapping("/test/authentication")
-    public void testAuthentication() {
+    @PostMapping("/test/authorization")
+    public void checkAuthorization() {
     }
 }

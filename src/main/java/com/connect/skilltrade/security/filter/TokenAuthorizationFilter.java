@@ -25,13 +25,13 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-public class TokenAuthenticationFilter extends OncePerRequestFilter {
+public class TokenAuthorizationFilter extends OncePerRequestFilter {
 
     private final ObjectMapper objectMapper;
     private final TokenExtractor tokenExtractor;
     private final String grantType;
 
-    public TokenAuthenticationFilter(
+    public TokenAuthorizationFilter(
             ObjectMapper objectMapper,
             TokenExtractor tokenExtractor,
             @Value("${security.grant-type}") String grantType
@@ -57,18 +57,18 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             Long userId = tokenExtractor.extractUserId(accessToken);
-            log.info("Authorization user ID: {}", userId);
+            log.info("Authorization User ID: {}", userId);
 
             RequestAttributes requestContext = Objects.requireNonNull(RequestContextHolder.getRequestAttributes());
             requestContext.setAttribute(HttpHeaders.AUTHORIZATION, userId, RequestAttributes.SCOPE_REQUEST);
 
             filterChain.doFilter(request, response);
         } catch (BusinessException e) {
-            log.warn("Authentication Exception Message: {}", e.getMessage(), e.getCause());
+            log.warn("Authorization Exception Message: {}", e.getMessage(), e.getCause());
             sendExceptionResponse(response, e.getExceptionStatus(), e.getMessage());
         } catch (Exception e) {
-            log.error("Authentication Exception Message: {}", e.getMessage(), e);
-            sendExceptionResponse(response, SecurityExceptionStatus.INTERNAL_AUTH_ERROR);
+            log.error("Authorization Exception Message: {}", e.getMessage(), e);
+            sendExceptionResponse(response, SecurityExceptionStatus.INTERNAL_AUTHORIZATION_ERROR);
         }
     }
 
