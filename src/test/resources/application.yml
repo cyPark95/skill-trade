@@ -7,3 +7,10 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+
+security:
+  grant-type: Test
+  jwt:
+    secret: 7YWM7Iqk7Yq4IOy9lOuTnOyXkOyEnCDsgqzsmqntlaAgSldUIOyLnO2BrOumvw==
+    access-token-validate-in-seconds: 2
+    refresh-token-validate-in-seconds: 5
