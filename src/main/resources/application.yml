@@ -27,4 +27,6 @@ security:
 
 oauth:
   google:
-    client-id: 626230514394-0lgpmen2ihmjq461g7i1pqaeab10kmoc.apps.googleusercontent.com
+    client-id: {}
+    redirect-uri: {}
+    client-secret : {}
