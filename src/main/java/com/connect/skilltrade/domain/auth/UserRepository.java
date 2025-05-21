@@ -1,4 +1,4 @@
-package com.connect.skilltrade.domain.user;
+package com.connect.skilltrade.domain.auth;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
