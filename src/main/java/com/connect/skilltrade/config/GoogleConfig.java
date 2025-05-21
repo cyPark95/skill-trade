@@ -1,4 +1,4 @@
-package com.connect.skilltrade.config;
+package com.connect.skilltrade.domain.auth.provider;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;

@@ -1,4 +1,4 @@
-package com.connect.skilltrade.domain.user;
+package com.connect.skilltrade.domain.auth;
 
 import com.connect.skilltrade.common.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -21,21 +21,24 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     @Enumerated(value = STRING)
-    private Provider provider;
+    private SocialType socialType;
 
     private String providerId;
 
     private String nickname;
+    private String email;
 
 
     @Builder
     public User(
-            Provider provider,
+            SocialType socialType,
             String providerId,
-            String nickname
+            String nickname,
+            String email
     ){
-        this.provider = provider;
+        this.socialType = socialType;
         this.providerId = providerId;
         this.nickname = nickname;
+        this.email = email;
     }
 }
