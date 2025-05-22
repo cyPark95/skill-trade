@@ -2,6 +2,7 @@ package com.connect.skilltrade.security.infrastructure;
 
 import com.connect.skilltrade.common.exception.BusinessException;
 import com.connect.skilltrade.security.domain.*;
+import com.connect.skilltrade.security.domain.user.domain.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

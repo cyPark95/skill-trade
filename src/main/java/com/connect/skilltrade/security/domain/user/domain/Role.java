@@ -1,4 +1,4 @@
-package com.connect.skilltrade.security.domain;
+package com.connect.skilltrade.security.domain.user.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,8 @@
-package com.connect.skilltrade.domain.auth;
+package com.connect.skilltrade.security.domain.user.domain;
 
 import com.connect.skilltrade.common.entity.BaseTimeEntity;
+import com.connect.skilltrade.security.domain.oidc.domain.OAuthType;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,35 +10,34 @@ import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-@Entity
 @Getter
-@Table(name = "users")
 @NoArgsConstructor(access = PROTECTED)
-public class User extends BaseTimeEntity {
+@Entity
+@Table(name = "authentication-users")
+public class AuthenticationUser extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Enumerated(value = STRING)
-    private SocialType socialType;
-
     private String providerId;
 
-    private String nickname;
+    @Enumerated(value = STRING)
+    private OAuthType oAuthType;
+
     private String email;
 
-
-    @Builder
-    public User(
-            SocialType socialType,
+    public AuthenticationUser(
             String providerId,
-            String nickname,
+            OAuthType oAuthType,
             String email
-    ){
-        this.socialType = socialType;
+    ) {
         this.providerId = providerId;
-        this.nickname = nickname;
+        this.oAuthType = oAuthType;
         this.email = email;
+    }
+
+    public String getToken() {
+        return this.oAuthType + "_" + this.providerId;
     }
 }

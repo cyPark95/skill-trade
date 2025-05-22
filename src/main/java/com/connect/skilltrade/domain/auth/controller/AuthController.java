@@ -1,8 +1,8 @@
 package com.connect.skilltrade.domain.auth.controller;
 
-import com.connect.skilltrade.domain.auth.dto.OIDCUserInfo;
-import com.connect.skilltrade.domain.auth.provider.OIDCProvider;
+import com.connect.skilltrade.security.domain.oidc.domain.dto.info.OIDCUserInfo;
 import com.connect.skilltrade.domain.auth.service.AuthService;
+import com.connect.skilltrade.security.domain.oidc.domain.provider.OIDCProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +21,7 @@ public class AuthController {
     @GetMapping("/auth/login")
     public ResponseEntity<?> redirectToSocialLogin(@RequestParam String socialType) {
         OIDCProvider provider = authService.getService(socialType);
-        String authorizeUrl = provider.generateLoginLink();
+        String authorizeUrl = provider.getAuthorizationUrl();
         return ResponseEntity.ok(authorizeUrl);
     }
 

@@ -1,8 +1,9 @@
 package com.connect.skilltrade.domain.auth.service;
 
-import com.connect.skilltrade.domain.auth.dto.OIDCUserInfo;
-import com.connect.skilltrade.domain.auth.provider.GoogleOIDCProvider;
-import com.connect.skilltrade.domain.auth.provider.OIDCProvider;
+import com.connect.skilltrade.security.domain.oidc.domain.dto.info.OIDCUserInfo;
+import com.connect.skilltrade.security.domain.oidc.domain.OAuthType;
+import com.connect.skilltrade.security.domain.oidc.domain.provider.GoogleOIDCProvider;
+import com.connect.skilltrade.security.domain.oidc.domain.provider.OIDCProvider;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class AuthService {
 
     public OIDCProvider getService(String socialType) {
         return oidcProviders.stream()
-                .filter(url -> url.supports(socialType))
+                .filter(url -> url.supports(OAuthType.valueOf(socialType)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("지원되지 않는 소셜로그인 형식 : " + socialType));
     }
@@ -27,7 +28,7 @@ public class AuthService {
         OIDCProvider provider = getService(socialType);
 
         if (provider instanceof GoogleOIDCProvider googleOIDCProvider) {
-            return googleOIDCProvider.getUserInfo(code);
+            return googleOIDCProvider.getOIDCUserInfo(code);
         }
         throw new IllegalArgumentException("xxx");
     }

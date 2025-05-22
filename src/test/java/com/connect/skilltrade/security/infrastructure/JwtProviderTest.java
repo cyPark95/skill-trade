@@ -1,7 +1,7 @@
 package com.connect.skilltrade.security.infrastructure;
 
 import com.connect.skilltrade.common.exception.BusinessException;
-import com.connect.skilltrade.security.domain.Role;
+import com.connect.skilltrade.security.domain.user.domain.Role;
 import com.connect.skilltrade.security.domain.SecurityExceptionStatus;
 import com.connect.skilltrade.security.domain.Token;
 import org.junit.jupiter.api.BeforeEach;
