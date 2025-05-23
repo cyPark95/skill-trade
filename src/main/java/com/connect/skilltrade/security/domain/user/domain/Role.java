@@ -1,16 +1,27 @@
 package com.connect.skilltrade.security.domain.user.domain;
 
+import com.connect.skilltrade.common.entity.BaseTimeEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
 
 @Getter
-@RequiredArgsConstructor
-public enum Role {
+@Entity
+@Table(name = "roles")
+@NoArgsConstructor(access = PROTECTED)
+public class Role extends BaseTimeEntity {
 
-    USER("일반 사용자"),
-    EXPERT("전문가"),
-    ADMIN("관리자")
-    ;
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private Long id;
 
-    private final String description;
+    @Enumerated(EnumType.STRING)
+    private RoleType roleType;
+
+    public Role(RoleType roleType) {
+        this.roleType = roleType;
+    }
 }

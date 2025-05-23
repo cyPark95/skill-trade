@@ -1,8 +1,5 @@
-package com.connect.skilltrade.security.domain;
+package com.connect.skilltrade.security.domain.token.domain;
 
-import lombok.Builder;
-
-@Builder
 public record Token(
         String accessToken,
         Long accessTokenExpiredAt,

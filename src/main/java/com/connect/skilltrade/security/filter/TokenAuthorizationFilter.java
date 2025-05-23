@@ -4,7 +4,7 @@ import com.connect.skilltrade.common.exception.BusinessException;
 import com.connect.skilltrade.common.exception.ExceptionStatus;
 import com.connect.skilltrade.common.response.ExceptionResponse;
 import com.connect.skilltrade.security.domain.SecurityExceptionStatus;
-import com.connect.skilltrade.security.domain.TokenExtractor;
+import com.connect.skilltrade.security.domain.token.domain.TokenExtractor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,11 +56,11 @@ public class TokenAuthorizationFilter extends OncePerRequestFilter {
         }
 
         try {
-            Long userId = tokenExtractor.extractUserId(accessToken);
-            log.info("Authorization User ID: {}", userId);
+            String userToken = tokenExtractor.extractUserToken(accessToken);
+            log.info("Authorization User ID: {}", userToken);
 
             RequestAttributes requestContext = Objects.requireNonNull(RequestContextHolder.getRequestAttributes());
-            requestContext.setAttribute(HttpHeaders.AUTHORIZATION, userId, RequestAttributes.SCOPE_REQUEST);
+            requestContext.setAttribute(HttpHeaders.AUTHORIZATION, userToken, RequestAttributes.SCOPE_REQUEST);
 
             filterChain.doFilter(request, response);
         } catch (BusinessException e) {

@@ -1,8 +1,10 @@
-package com.connect.skilltrade.security.infrastructure;
+package com.connect.skilltrade.security.domain.token.infrastructure;
 
 import com.connect.skilltrade.common.exception.BusinessException;
-import com.connect.skilltrade.security.domain.*;
-import com.connect.skilltrade.security.domain.user.domain.Role;
+import com.connect.skilltrade.security.domain.SecurityExceptionStatus;
+import com.connect.skilltrade.security.domain.token.domain.Token;
+import com.connect.skilltrade.security.domain.token.domain.TokenExtractor;
+import com.connect.skilltrade.security.domain.token.domain.TokenGenerator;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -13,15 +15,12 @@ import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class JwtProvider implements TokenGenerator, TokenExtractor {
 
     private static final int SECONDS_TO_MILLISECONDS = 1000;
-    private static final String ROLE_CLAIM_KEY = "roles";
 
     private final SecretKey secretKey;
     private final long accessTokenValidityTime;
@@ -38,8 +37,8 @@ public class JwtProvider implements TokenGenerator, TokenExtractor {
     }
 
     @Override
-    public Token generateToken(Long userId, List<Role> roles) {
-        String accessToken = createAccessJwt(userId, roles);
+    public Token generateToken(String userToken) {
+        String accessToken = createAccessJwt(userToken);
         String refreshToken = createRefreshJwt();
 
         return new Token(
@@ -50,7 +49,7 @@ public class JwtProvider implements TokenGenerator, TokenExtractor {
     }
 
     @Override
-    public Long extractUserId(String accessToken) throws BusinessException {
+    public String extractUserToken(String accessToken) throws BusinessException {
         Claims claims = getClaims(accessToken);
         String subject = claims.getSubject();
 
@@ -58,21 +57,7 @@ public class JwtProvider implements TokenGenerator, TokenExtractor {
             throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NOT_FOUND);
         }
 
-        return Long.valueOf(subject);
-    }
-
-    @Override
-    public List<Role> extractRoles(String accessToken) {
-        Claims claims = getClaims(accessToken);
-        List<?> roles = claims.get(ROLE_CLAIM_KEY, List.class);
-
-        if (roles == null || roles.isEmpty()) {
-            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_ROLE_CLAIM_NOT_FOUND);
-        }
-
-        return roles.stream()
-                .map(role -> Role.valueOf(role.toString().toUpperCase()))
-                .collect(Collectors.toList());
+        return subject;
     }
 
     private SecretKey createSecretKey(String secret) {
@@ -80,23 +65,18 @@ public class JwtProvider implements TokenGenerator, TokenExtractor {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private String createAccessJwt(Long id, List<Role> roles) {
-        if(id == null) {
+    private String createAccessJwt(String token) {
+        if(token == null) {
             throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_SUBJECT_NULL_OR_EMPTY);
-        }
-
-        if(roles == null || roles.isEmpty()) {
-            throw new BusinessException(SecurityExceptionStatus.ACCESS_TOKEN_ROLE_CLAIM_NULL_OR_EMPTY);
         }
 
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + (this.accessTokenValidityTime * SECONDS_TO_MILLISECONDS));
 
         return Jwts.builder()
-                .subject(id.toString())
+                .subject(token)
                 .issuedAt(now)
                 .expiration(expiredDate)
-                .claim(ROLE_CLAIM_KEY, roles)
                 .signWith(this.secretKey)
                 .compact();
     }

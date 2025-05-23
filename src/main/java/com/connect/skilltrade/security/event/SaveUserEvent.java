@@ -1,6 +1,6 @@
 package com.connect.skilltrade.security.event;
 
-public record SaveUser(
+public record SaveUserEvent(
         String token,
         String email
 ) {

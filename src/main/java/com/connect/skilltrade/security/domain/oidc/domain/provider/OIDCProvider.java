@@ -7,7 +7,5 @@ public interface OIDCProvider {
 
     boolean supports(OAuthType type);
 
-    String getAuthorizationUrl();
-
     OIDCUserInfo getOIDCUserInfo(String code);
 }

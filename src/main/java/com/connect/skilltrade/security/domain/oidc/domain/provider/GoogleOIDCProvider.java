@@ -14,19 +14,13 @@ import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
-import java.util.List;
 
 @Component
 public class GoogleOIDCProvider implements OIDCProvider {
-
-    private static final String BASIC_APPROVAL_CODE = "code";
-    private static final List<String> SCOPE_ARGUMENTS = List.of("openid", "email");
-    private static final String NAME_PAYLOAD_KEY = "name";
 
     private final RestClient restClient;
     private final GoogleOIDCProperties googleOIDCProperties;
@@ -42,19 +36,8 @@ public class GoogleOIDCProvider implements OIDCProvider {
     }
 
     @Override
-    public boolean supports(OAuthType OAuthType) {
-        return OAuthType.GOOGLE == OAuthType;
-    }
-
-    @Override
-    public String getAuthorizationUrl() {
-        return UriComponentsBuilder.fromUriString(googleOIDCProperties.getLoginUrl())
-                .queryParam("response_type", BASIC_APPROVAL_CODE)
-                .queryParam("client_id", googleOIDCProperties.getClientId())
-                .queryParam("scope", SCOPE_ARGUMENTS)
-                .queryParam("redirect_uri", googleOIDCProperties.getRedirectUri())
-                .build()
-                .toUriString();
+    public boolean supports(OAuthType oAuthType) {
+        return OAuthType.GOOGLE == oAuthType;
     }
 
     @Override
@@ -65,8 +48,7 @@ public class GoogleOIDCProvider implements OIDCProvider {
 
         return new OIDCUserInfo(
                 payload.getSubject(),
-                payload.getEmail(),
-                (String) payload.get(NAME_PAYLOAD_KEY)
+                payload.getEmail()
         );
     }
 

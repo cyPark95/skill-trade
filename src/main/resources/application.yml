@@ -3,9 +3,9 @@ spring:
     name: skill-trade
 
   datasource:
-    url: jdbc:mysql://localhost:3306/skill-trade
+    url: jdbc:mysql://localhost:4406/skill-trade
     username: root
-    password: password
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -27,7 +27,6 @@ security:
 oauth:
   oidc:
     google:
-      login-url: https://accounts.google.com/o/oauth2/v2/auth}
       token-request-url: https://oauth2.googleapis.com/token
       grant-type: authorization_code
       client-id: {}

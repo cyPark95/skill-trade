@@ -1,11 +1,10 @@
 package com.connect.skilltrade.security.filter;
 
-import com.connect.skilltrade.security.domain.user.domain.Role;
 import com.connect.skilltrade.security.domain.SecurityExceptionStatus;
-import com.connect.skilltrade.security.domain.Token;
-import com.connect.skilltrade.security.domain.TokenGenerator;
+import com.connect.skilltrade.security.domain.token.domain.Token;
+import com.connect.skilltrade.security.domain.token.domain.TokenGenerator;
 import com.connect.skilltrade.security.filter.controller.TokenAuthorizationFilterTestController;
-import com.connect.skilltrade.security.infrastructure.JwtProvider;
+import com.connect.skilltrade.security.domain.token.infrastructure.JwtProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -25,8 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest({TokenAuthorizationFilter.class, JwtProvider.class, TokenAuthorizationFilterTestController.class})
 class TokenAuthorizationFilterTest {
 
-    private static final long USER_ID = -1L;
-    private static final List<Role> ROLES = List.of(Role.EXPERT, Role.USER);
+    private static final String USER_TOKEN = "OAuth Token";
 
     @Autowired
     private MockMvc mvc;
@@ -41,7 +37,7 @@ class TokenAuthorizationFilterTest {
     @Test
     void successesAuthentication() throws Exception {
         // given
-        Token token = tokenGenerator.generateToken(USER_ID, ROLES);
+        Token token = tokenGenerator.generateToken(USER_TOKEN);
 
         // when
         // then
@@ -90,8 +86,8 @@ class TokenAuthorizationFilterTest {
     @Test
     void failAuthentication_expiredToken() throws Exception {
         // given
-        Token token = tokenGenerator.generateToken(USER_ID, ROLES);
-        Thread.sleep(2000);
+        Token token = tokenGenerator.generateToken(USER_TOKEN);
+        Thread.sleep(1000);
 
         // when
         // then
